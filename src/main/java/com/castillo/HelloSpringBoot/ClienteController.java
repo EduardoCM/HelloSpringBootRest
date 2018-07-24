@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.springframework.http.MediaType;
+import org.springframework.http.MediaTypeEditor;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -11,20 +15,50 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-@RequestMapping("/cliente")
+import com.castillo.model.Persona;
+
+//@RestController
+//@RequestMapping("/cliente")
+@Controller
 public class ClienteController {
 	
-	private static final String template = "Nuevo Cliente, %s";
 	private final AtomicLong counter = new AtomicLong();
 	
+	@RequestMapping(path = "/body")
+	@ResponseBody
+	public String body() {
+		return "lista";
+	}
+
+	@RequestMapping(path = "/lista")
+	public String estado(Model model) {
+		model.addAttribute("nombre", "Lista de nombresssss");
+		return "lista";
+	}
 	
-	@RequestMapping("/getClientes")
+	@RequestMapping(path="/persona/{id}")
+	public String muestra(@PathVariable String id, Model model) {
+		model.addAttribute("usuario", new Persona("persona " + id, "Selva"));
+		return "persona";
+	}
+	
+	@RequestMapping(path="/defecto")
+	public void resolucionPorDefeco() {}
+	
+	
+	@RequestMapping(path="/dir/defecto")
+	public void subdirectorio() {}
+	
+	
+	
+	
+	
+	@RequestMapping(path = "/getClientes", produces= {MediaType.APPLICATION_XML_VALUE} )
 	public List<Cliente> getClientes(){
 		System.out.println(":::::::::: Inicio de ejecucion para solicitar clientes :::::::::");
-		Cliente eduardo = new Cliente(counter.incrementAndGet(), "Eduardo");
-		Cliente zoe = new Cliente(counter.incrementAndGet(), "Zoe");
-		Cliente vere = new Cliente(counter.incrementAndGet(), "Vere");
+		Cliente eduardo = new Cliente(counter.incrementAndGet(), "Eduardo", "Jilotepec");
+		Cliente zoe = new Cliente(counter.incrementAndGet(), "Zoe", "Chapa Mota");
+		Cliente vere = new Cliente(counter.incrementAndGet(), "Vere", "TImilpan");
 		
 		List<Cliente> listClient = new ArrayList<>();
 		listClient.add(eduardo);
@@ -35,6 +69,11 @@ public class ClienteController {
 		System.out.println(listClient);
 		
 		return listClient;
+	}
+	
+	@RequestMapping(path="/obtenerCliente", produces= {MediaType.APPLICATION_XML_VALUE}, method=RequestMethod.GET)
+	public Cliente getCliente() {
+		return new Cliente(counter.incrementAndGet(), "IamExpert in Spring", "Jilotepec");
 	}
 	
 	@RequestMapping(path="/cliente", method= RequestMethod.GET)
